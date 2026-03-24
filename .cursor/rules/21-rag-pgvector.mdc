@@ -1,0 +1,22 @@
+---
+description: RAG·pgvector: 임베딩 일관성·청크·검색·스코프
+globs: "{backend,server,api}/**/*.py"
+alwaysApply: false
+---
+
+# RAG·pgvector
+
+## 임베딩
+- 문서·쿼리는 **동일 임베딩 모델·차원**을 사용한다. DB 컬럼 차원과 **정확히 일치**시킨다.
+- 모델을 바꾸면 **재색인**이 필요하다는 점을 문서/마이그레이션에 남긴다.
+
+## 청킹·메타
+- 청크는 `project_id`, `file_id`, `chunk_index`, `content`, `embedding` 외에 **출처 표시용** `source_path` 또는 `offset`을 둔다.
+- `scope` 구현 시: `settings_only`는 설정/로어 경로에만 해당하는 청크를, `manuscript_*`는 원고 경로 청크를 포함한다(경로 규칙 또는 태그로 구분).
+
+## 검색
+- 기본은 **top_k + 유사도 임계값**(선택). 결과가 비면 “근거 없음” 응답을 허용한다.
+- **MMR** 등 다양성 옵션은 데이터가 커질 때 도입한다.
+
+## 프라이버시
+- RAG 검색 결과에 **다른 프로젝트** 청크가 섞이면 안 된다. SQL 쿼리에 `project_id` 조건을 강제한다.

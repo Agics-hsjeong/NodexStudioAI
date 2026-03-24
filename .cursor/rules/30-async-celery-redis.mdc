@@ -1,0 +1,25 @@
+---
+description: Celery·Redis: 큐·재시도·멱등·모니터링·운영
+globs: "{backend,server,api}/**/*.py"
+alwaysApply: false
+---
+
+# Celery·Redis
+
+## 역할 분리
+- **Redis**: 브로커(및 선택적 결과 백엔드), 캐시(임베딩 캐시·레이트리밋 카운터)로 분리해 운영한다.
+- **큐**: `ingest`(필수), `low`(재색인·정리) 분리. 워커는 프로세스 수로 스케일한다.
+
+## 태스크 설계
+- 시그니처는 `(file_id, content_hash, ...)`처럼 **멱등 키**를 명시한다.
+- `acks_late=True` 등 재시도 정책은 **부작용**(중복 청크)을 고려해 설정한다.
+- 실패 시 `FileObject.index_status=failed` + `last_error`(사용자에게 안전한 메시지)를 남긴다.
+
+## 재시도
+- 외부 API(임베딩/Gemini)는 exponential backoff + 최대 횟수. 영구 실패는 **재시도 버튼**(UI) 또는 관리자 재처리로 연결한다.
+
+## 관측성
+- `celery`/`task_id`를 로그에 남기고, Flower(선택) 또는 Sentry로 연동한다.
+
+## 운영
+- Redis는 **persist** 정책과 메모리 상한을 설정한다. 운영 환경에서는 비밀번호·ACL을 적용한다.

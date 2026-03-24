@@ -1,0 +1,25 @@
+---
+description: Docker·nginx·배포: 네트워크·헬스체크·시크릿·TLS
+globs: "**/{Dockerfile,docker-compose*.yml,compose*.yml,nginx*.conf,.env.example}"
+alwaysApply: false
+---
+
+# Docker·nginx
+
+## Compose
+- 서비스: `nginx`, `frontend`, `backend`, `db`, `redis`, `minio`, `celery`, (선택) `celery-beat`.
+- **내부 DNS 이름**으로만 서로 연결하고, 불필요한 포트는 호스트에 노출하지 않는다.
+
+## 헬스체크
+- 각 컨테이너에 `healthcheck`를 둔다. `backend`는 `/health` 또는 `/api/health/`, `db`는 `pg_isready` 등.
+
+## nginx
+- `location /api/` → `proxy_pass` Gunicorn; `proxy_set_header Host/X-Forwarded-*` 설정.
+- TLS 종료는 nginx 또는 외부 LB. `client_max_body_size`, `proxy_read_timeout`은 업로드·RAG·Gemini에 맞춘다.
+- MinIO 콘솔/API는 **외부 공개 최소화**(내부만 또는 백엔드 전용).
+
+## 시크릿
+- `.env`는 git에 커밋하지 않는다. CI/CD는 시크릿 스토어를 사용한다.
+
+## 이미지
+- 프로덕션은 **멀티스테이지 빌드**로 이미지 크기를 줄인다. 베이스 이미지는 고정 태그/다이제스트를 선호한다.

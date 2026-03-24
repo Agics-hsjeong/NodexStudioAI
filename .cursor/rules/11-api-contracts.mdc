@@ -1,0 +1,29 @@
+---
+description: HTTP/API 계약: JSON 형식·에러코드·페이지네이션·버전
+globs: "{backend,server,api}/**/*.py"
+alwaysApply: false
+---
+
+# API 계약(DRF)
+
+## 일반
+- **Base path**: `/api/` (nginx 프록시와 일치). 프론트는 상대 경로 또는 `PUBLIC_API_URL`로만 호출한다.
+- **Content-Type**: `application/json`. 파일 업로드는 별도 엔드포인트(멀티파트/프리사인)로 분리한다.
+
+## 성공 응답(권장)
+- 목록: `{ "results": [...], "next": null, "previous": null, "count": N }` 형태 또는 DRF 표준 페이지네이션과 일관되게 유지한다.
+- 단일 객체: 직렬화된 리소스 필드만. 불필요한 중첩을 피한다.
+
+## 에러 응답(권장)
+- 형식: `{ "error": { "code": "STRING", "message": "human readable", "details": {} } }`
+- HTTP 상태: 400(검증), 401(미인증), 403(권한), 404(없음/다른 사용자), 409(충돌), 429(레이트리밋), 503(유지보수/의존성 장애).
+
+## RAG
+- `POST /api/rag/query` body: `project_id`, `query`, `top_k`, `scope`, (선택) `file_ids` 필터.
+- 응답 청크: `content`, `score`, `source`, `file_id`, `chunk_index` 등 **출처 재현에 필요한 최소 필드**를 포함한다.
+
+## Gemini 프록시
+- `POST /api/ai/gemini`: 쿼터 검증 후 호출. 요청 body에 **원문 전체를 불필요하게 넣지 않도록** 설계한다(필요한 RAG 청크만).
+
+## 버전
+- 하위 호환을 깨는 변경 시 `X-Api-Version` 또는 URL 버전(`/api/v1/`)을 도입하고 문서에 기록한다.

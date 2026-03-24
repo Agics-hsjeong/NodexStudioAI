@@ -1,0 +1,28 @@
+---
+description: Django/DRF 구현: 모델·권한·직렬화·트랜잭션·업로드
+globs: "{backend,server,api}/**/*.py"
+alwaysApply: false
+---
+
+# 백엔드(Django/DRF)
+
+## 모델·데이터
+- **소유권**: `Project`, `FileObject` 등은 `user` FK를 두고, 쿼리셋은 `request.user`로 필터한다.
+- **경로**: `relative_path`는 **정규화**(슬래시, `..` 제거)하고, 최대 길이 제한을 둔다.
+
+## 뷰·권한
+- `get_object_or_404`를 쓰더라도 **소유자 검증**을 빠뜨리지 않는다. “다른 사용자 리소스”는 404로 통일할지 403으로 할지 팀 규칙에 맞춘다.
+- 관리자/스태프 전용 엔드포인트는 `IsAdminUser` 등으로 명시한다.
+
+## 직렬화·검증
+- 입력 검증은 `Serializer`/`validate()`에 모은다. 비즈니스 규칙(예: 티어 한도)은 서비스 레이어로 분리해도 된다.
+
+## 트랜잭션
+- 파일 메타 생성 + MinIO 업로드 완료 + 색인 태스크 enqueue는 **원자성**을 고려한다. 실패 시 보상 트랜잭션(삭제/정리)을 남긴다.
+
+## 업로드
+- 가능하면 **프리사인 PUT**으로 클라이언트→MinIO 직접 업로드 후, 서버에서 완료 콜백/확인으로 `FileObject`를 `ready`로 전환한다.
+- 업로드 크기 제한은 **nginx + 앱** 양쪽에서 일관되게 설정한다.
+
+## 보안 헤더
+- 프로덕션에서 `SECURE_*`, HSTS(HTTPS), `X-Content-Type-Options` 등을 활성화한다.

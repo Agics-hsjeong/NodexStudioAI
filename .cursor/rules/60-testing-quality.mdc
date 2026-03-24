@@ -1,0 +1,22 @@
+---
+description: 테스트·품질: 백엔드(pytest)·프론트·E2E 최소 기준
+globs: "{backend,server,api,src,frontend,web,app}/**/*.{py,ts,js,svelte}"
+alwaysApply: false
+---
+
+# 테스트·품질
+
+## 백엔드(Python)
+- 권한·소유권: **다른 사용자의 `project_id`로 접근 시 거부**를 반드시 테스트한다.
+- RAG: 동일 `project_id`만 반환되는지, 빈 결과 처리가 안전한지 테스트한다.
+- Celery: 태스크는 **멱등성**이 있는 핵심 경로를 단위 테스트로 커버한다(모킹 가능).
+
+## 프론트
+- LoreDex·Gemini 토글: **클라우드 전송 경로가 꺼졌을 때 호출되지 않음**을 테스트(가능하면).
+- 레이아웃: 스플리터/저장 상태 회귀는 **스냅샷보다는 핵심 동작** 위주로 테스트한다.
+
+## E2E(선택)
+- 로그인 → 프로젝트 → 파일 열기 → LoreDex 질문까지 **스모크** 시나리오를 하나 둔다.
+
+## 린트·포맷
+- 프로젝트에 `ruff`/`black`/`eslint`/`prettier` 등을 도입하면 **CI에서 동일하게** 돌린다.

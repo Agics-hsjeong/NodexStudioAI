@@ -1,0 +1,87 @@
+# --- OS ---
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+*~
+
+# --- Env & secrets ---
+.env
+.env.*
+!.env.example
+!.env.*.example
+*.pem
+*.key
+secrets/
+
+# --- Python / Django ---
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+venv/
+.venv/
+env/
+ENV/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+htmlcov/
+.coverage
+coverage.xml
+*.cover
+.hypothesis/
+django.log
+local_settings.py
+
+# --- Node / SvelteKit ---
+node_modules/
+.svelte-kit/
+build/
+dist/
+.vercel/
+.output/
+vite.config.ts.timestamp-*.mjs
+*.tsbuildinfo
+
+# --- Logs & temp ---
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+tmp/
+temp/
+.cache/
+
+# --- Docker / local data ---
+*.local.yml
+docker-compose.override.yml
+
+# --- IDE / editor ---
+.idea/
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.json.example
+*.sublime-*
+
+# --- Misc ---
+*.orig
+*.bak
