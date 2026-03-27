@@ -417,6 +417,7 @@
   * `/api/` → Django.
   * `/minio/` 는 프로덕션에선 외부 노출 최소화(내부만 또는 백엔드 전용 경로).
 * **WebSocket:** 실시간 협업을 도입할 때만 `Upgrade` 헤더 설정(초기에는 선택).
+* **Let's Encrypt (HTTP-01) & 공개 도메인:** DNS `A`/`AAAA`가 이 스택이 뜨는 호스트의 공인 IP를 가리켜야 하며, 인터넷에서 `http://도메인:80/.well-known/acme-challenge/`가 컨테이너 nginx까지 도달해야 한다. Compose 기본은 호스트 `80→컨테이너 80` 매핑. 호스트(Ubuntu 등) 패키지 nginx가 이미 80을 쓰면 `.env`에서 `NGINX_HTTP_PORT=8188` 등으로 바꾸고, 호스트 nginx는 `infra/nginx/host-forward-80.example.conf`처럼 `127.0.0.1:해당포트`로 **프록시**한다(사설 IP·비표준 포트로의 `302`는 검증 실패). HTTP-01 이 불가능하면 `infra/scripts/init-letsencrypt-dns01.sh`로 DNS-01(수동 TXT) 발급을 시도한다.
 
 ---
 
